@@ -95,6 +95,10 @@ public class Flight {
 	
 	//标记是否处于时间窗
 	public boolean isIncludedInTimeWindow = false;
+	//处于时间窗外的航班固定好飞行时间
+	public int fixedTakeoffTime;
+	public int fixedLandingTime;
+	
 	
 	public Set<Integer> discreteTimePointSet = new HashSet<>();
 	public List<Integer> discreteTimePointList = new ArrayList<>();

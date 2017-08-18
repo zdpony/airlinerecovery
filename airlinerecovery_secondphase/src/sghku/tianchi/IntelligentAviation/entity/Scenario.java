@@ -199,6 +199,8 @@ public class Scenario {
 		for(Flight f:flightList) {
 			if(f.initialTakeoffT < Parameter.timeWindowStartTime || f.initialTakeoffT > Parameter.timeWindowEndTime) {
 				f.isIncludedInTimeWindow = false;
+				f.fixedTakeoffTime = f.initialTakeoffT;
+				f.fixedLandingTime = f.initialLandingT;
 			}else {
 				f.isIncludedInTimeWindow = true;
 			}
@@ -207,6 +209,23 @@ public class Scenario {
 		//判断前半段处于调整时间窗外的联程航班
 		for(ConnectingFlightpair cf:connectingFlightPairList) {
 			if(!cf.firstFlight.isIncludedInTimeWindow && cf.secondFlight.isIncludedInTimeWindow) {
+				for(int i=0;i<=432;i++){
+					FlightArc fa = new FlightArc();
+					fa.flight = cf.secondFlight;
+					fa.aircraft = cf.initialAircraft;
+					fa.delay = i*5;
+					fa.takeoffTime = cf.secondFlight.initialTakeoffT + fa.delay;
+					fa.landingTime = cf.secondFlight.initialLandingT + fa.delay;
+					
+					if(!fa.checkViolation()){
+						
+						cf.secondFlight.fixedTakeoffTime = fa.takeoffTime;
+						cf.secondFlight.fixedLandingTime = fa.landingTime;
+					
+						break;
+					}
+				}
+				
 				cf.secondFlight.isIncludedInTimeWindow = false;
 			}
 		}
@@ -221,6 +240,9 @@ public class Scenario {
 				itineraryList.add(ite);
 			}
 		}
+		
+		//read transfer passenger
+		readTransferPassengerInformation();
 		
 		//为每一个行程检测可以替代的航班
 		for(Itinerary ite:itineraryList) {

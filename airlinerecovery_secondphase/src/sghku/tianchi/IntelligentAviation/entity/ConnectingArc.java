@@ -1,5 +1,7 @@
 package sghku.tianchi.IntelligentAviation.entity;
 
+import org.apache.poi.hssf.record.CFHeader12Record;
+
 import sghku.tianchi.IntelligentAviation.common.ExcelOperator;
 import sghku.tianchi.IntelligentAviation.common.Parameter;
 
@@ -63,33 +65,29 @@ public class ConnectingArc {
 		cost += Parameter.COST_DELAY*secondArc.flight.importance*secondArc.delay/60.0;
 		
 		
-		/*//首先考虑联程乘客
-		int connectingCancelNum = 0;
+		//首先考虑联程乘客
+		int cancelConnectingPassenger = Math.max(connectingFlightPair.firstFlight.connectedPassengerNumber - aircraft.passengerCapacity, 0);
+		int flyConnectingPassenger = connectingFlightPair.firstFlight.connectedPassengerNumber - cancelConnectingPassenger;
 		
-		int actualNum = 0;
-		actualNum += connectingFlightPair.firstFlight.connectedPassengerNumber;
+		cost += cancelConnectingPassenger * Parameter.passengerCancelCost;
+		cost += flyConnectingPassenger * ExcelOperator.getPassengerDelayParameter(firstArc.delay);
+		
+		int passengerCapacity1 = aircraft.passengerCapacity - aircraft.passengerCapacity;
+		int passengerCapacity2 = aircraft.passengerCapacity - aircraft.passengerCapacity;
 
-		actualNum += connectingFlightPair.firstFlight.passengerNumber;
 		
-		int cancelNum = Math.max(0, actualNum-aircraft.passengerCapacity);
-		actualNum =  actualNum - cancelNum;
+		int cancelPassenger1 = Math.max(0, connectingFlightPair.firstFlight.passengerNumber-passengerCapacity1);
+		int flyPassenger1 = connectingFlightPair.firstFlight.passengerNumber - cancelPassenger1;
 		
-		cost += actualNum*ExcelOperator.getPassengerDelayParameter(firstArc.delay);
-		cost += cancelNum*Parameter.passengerCancelCost;
+		cost += cancelPassenger1 * Parameter.passengerCancelCost;
+		cost += flyPassenger1 * ExcelOperator.getPassengerDelayParameter(firstArc.delay);
 		
-		//计算第二个航班的普通乘客的delay和cancel
-		cancelNum = 0;
-		cancelNum = Math.max(0, connectingFlightPair.secondFlight.connectedPassengerNumber + connectingFlightPair.secondFlight.passengerNumber - aircraft.passengerCapacity);
-		int capacity = Math.max(0, aircraft.passengerCapacity-connectingFlightPair.secondFlight.connectedPassengerNumber);
-		actualNum = 0;
-		actualNum += connectingFlightPair.secondFlight.passengerNumber;
+		int cancelPassenger2 = Math.max(0, connectingFlightPair.secondFlight.passengerNumber-passengerCapacity2);
+		int flyPassenger2 = connectingFlightPair.secondFlight.passengerNumber - cancelPassenger2;
 		
-		cancelNum = Math.max(0, actualNum-aircraft.passengerCapacity);
-		actualNum =  actualNum - cancelNum- connectingFlightPair.secondFlight.connectedPassengerNumber;
-		actualNum = Math.max(0, actualNum);
+		cost += cancelPassenger2 * Parameter.passengerCancelCost;
+		cost += flyPassenger2 * ExcelOperator.getPassengerDelayParameter(secondArc.delay);
 		
-		cost += actualNum*ExcelOperator.getPassengerDelayParameter(secondArc.delay);
-		cost += cancelNum*Parameter.passengerCancelCost;*/
 	}
 	
 	public void update() {
